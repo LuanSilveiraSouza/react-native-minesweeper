@@ -16,6 +16,7 @@ export default function App() {
       <Field opened nearMines={3}/>
       <Field opened nearMines={6}/>
       <Field mined opened />
+      <Field flagged/>
     </View>
   );
 }
