@@ -8,55 +8,78 @@ import {
   hadExplosion,
   wonGame,
   showMines,
-  invertFlag,} from './src/logics';
+  invertFlag,
+  flagsUsed,} from './src/logics';
+import ModalLevel from './src/components/ModalLevel';
+import Header from './src/components/Header';
 import MineField from './src/components/MineField';
 
 export default function App() {
 
-  const minesAmount = Math.ceil(params.getRowsAmount() * params.getColumnsAmount() * params.difficultLevel);
+  const [rows, setRows] = useState(params.getRowsAmount());
+
+  const [columns, setColumns] = useState(params.getColumnsAmount());
 
   const [board, setBoard] = useState(
-    createMinedBoard(params.getRowsAmount(), params.getColumnsAmount(), minesAmount)
+    createMinedBoard(rows, columns, minesAmount)
     );
+
+  const [minesAmount, setMinesAmount] = useState(Math.ceil(rows * columns * params.difficultLevel));
   
   const [win, setWin] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const reset = () => {
+    setBoard(createMinedBoard(rows, columns, minesAmount))
+    setMinesAmount(Math.ceil(params.getRowsAmount() * columns * params.difficultLevel));
+    setWin(false);
+  }
 
   onOpenField = (row, column) => {
     const clonedBoard = cloneBoard(board);
     openField(clonedBoard, row, column);
     const lost = hadExplosion(clonedBoard);
-    const won = wonGame(clonedBoard);
+    setWin(wonGame(clonedBoard));
 
     if(lost) {
       showMines(clonedBoard);
-      Alert.alert('Fim de Jogo', 'Você Perdeu');
+      Alert.alert('Fim de Jogo', 'Você Perdeu', [{text: 'OK', onPress:() => reset()}]);
     }
 
-    if(won) {
-      Alert.alert('Parabéns', 'Você Ganhou!!!');
+    if(win) {
+      Alert.alert('Parabéns', 'Você Ganhou!!!', [{text: 'OK', onPress:() => reset()}]);
     }
 
     setBoard(clonedBoard);
-    setWin(true);
   }
 
   onSelectField = (row, column) => {
     const clonedBoard = cloneBoard(board);
     invertFlag(clonedBoard, row, column);
-    const won = wonGame(clonedBoard);
+    setWin(wonGame(clonedBoard));
 
-    if(won) {
-      Alert.alert('Parabéns', 'Você Ganhou!!!');
+    if(win) {
+      Alert.alert('Parabéns', 'Você Ganhou!!!', [{text: 'OK', onPress:() => reset()}]);
     }
 
     setBoard(clonedBoard);
   }
 
+  onLevelSelection = level => {
+    params.difficultLevel = level;
+    reset();
+    setShowModal(false);
+  }
+
   return (
     <View style={styles.container}>
-      <Text>Campo Minado</Text>
-      <Text>Tamanho do tabuleiro: {params.getRowsAmount()} * {params.getColumnsAmount()}</Text>
-
+      <ModalLevel isVisible={showModal}
+        onLevelSelected={onLevelSelection}
+        onCancel={() => setShowModal(false)} />
+      <Header flagsLeft={minesAmount - flagsUsed(board)}
+        onNewGame={() => reset()}
+        onFlagPress={() => setShowModal(true)}/>
       <View style={styles.board}>
         <MineField board={board} 
         onOpenField={onOpenField}
@@ -69,12 +92,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#eee',
     alignItems: 'center',
     justifyContent: 'center',
   },
   board: {
     alignItems: 'center',
-    backgroundColor: '#AAA',
+    paddingBottom: 10
   }
 });
