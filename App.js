@@ -7,7 +7,8 @@ import {
   openField,
   hadExplosion,
   wonGame,
-  showMines} from './src/logics';
+  showMines,
+  invertFlag,} from './src/logics';
 import MineField from './src/components/MineField';
 
 export default function App() {
@@ -17,6 +18,8 @@ export default function App() {
   const [board, setBoard] = useState(
     createMinedBoard(params.getRowsAmount(), params.getColumnsAmount(), minesAmount)
     );
+  
+  const [win, setWin] = useState(false);
 
   onOpenField = (row, column) => {
     const clonedBoard = cloneBoard(board);
@@ -30,7 +33,20 @@ export default function App() {
     }
 
     if(won) {
-      Alert.alert('Parabéns', 'Você Ganhou!!!')
+      Alert.alert('Parabéns', 'Você Ganhou!!!');
+    }
+
+    setBoard(clonedBoard);
+    setWin(true);
+  }
+
+  onSelectField = (row, column) => {
+    const clonedBoard = cloneBoard(board);
+    invertFlag(clonedBoard, row, column);
+    const won = wonGame(clonedBoard);
+
+    if(won) {
+      Alert.alert('Parabéns', 'Você Ganhou!!!');
     }
 
     setBoard(clonedBoard);
@@ -42,7 +58,9 @@ export default function App() {
       <Text>Tamanho do tabuleiro: {params.getRowsAmount()} * {params.getColumnsAmount()}</Text>
 
       <View style={styles.board}>
-        <MineField board={board} onOpenField={onOpenField} />
+        <MineField board={board} 
+        onOpenField={onOpenField}
+        onSelectField={onSelectField}/>
       </View>
     </View>
   );
