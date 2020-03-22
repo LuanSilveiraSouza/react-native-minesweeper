@@ -5,14 +5,14 @@ import Mine from './Mine';
 import Flag from './Flag';
 
 export default props => {
-  const {mined, opened, nearMines, flagged} = props;
+  const {mined, opened, nearMines, flagged, exploded} = props;
 
   const stylesField = [styles.field];
 
   if(opened) stylesField.push(styles.opened);
-  if(mined) stylesField.push(styles.exploded);
+  if(exploded) stylesField.push(styles.exploded);
   if(flagged) stylesField.push(styles.flagged);
-  if(!opened && !mined) stylesField.push(styles.regular);
+  if(!opened) stylesField.push(styles.regular);
   
   let color = null;
   if(nearMines > 0) {

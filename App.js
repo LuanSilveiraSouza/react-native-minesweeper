@@ -1,22 +1,25 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Field from './src/components/Field';
 import params from './src/params';
+import {createMinedBoard} from './src/logics';
+import MineField from './src/components/MineField';
 
 export default function App() {
+
+  const minesAmount = Math.ceil(params.getRowsAmount() * params.getColumnsAmount() * params.difficultLevel);
+
+  const [board, setBoard] = useState(
+    createMinedBoard(params.getRowsAmount(), params.getColumnsAmount(), minesAmount)
+    );
+
   return (
     <View style={styles.container}>
       <Text>Campo Minado</Text>
       <Text>Tamanho do tabuleiro: {params.getRowsAmount()} * {params.getColumnsAmount()}</Text>
 
-      <Field />
-      <Field opened />
-      <Field opened nearMines={1}/>
-      <Field opened nearMines={2}/>
-      <Field opened nearMines={3}/>
-      <Field opened nearMines={6}/>
-      <Field mined opened />
-      <Field flagged/>
+      <View style={styles.board}>
+        <MineField board={board}/>
+      </View>
     </View>
   );
 }
@@ -28,4 +31,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  board: {
+    alignItems: 'center',
+    backgroundColor: '#AAA',
+  }
 });
